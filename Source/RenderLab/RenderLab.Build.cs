@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class RenderLab : ModuleRules
@@ -7,22 +8,22 @@ public class RenderLab : ModuleRules
 	public RenderLab(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"Core"
-			}
-			);
+		//PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+		//PublicIncludePaths.AddRange(
+		//	new string[] {
+		//		"Core"
+		//	}
+		//	);
 				
 		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"CoreUObject",
-                "Engine",
-                "RenderCore",
-                "RHI"
-			}
-			);
+		//PrivateIncludePaths.AddRange(
+		//	new string[] {
+		//		"CoreUObject",
+  //              "Engine",
+  //              "RenderCore",
+  //              "RHI"
+		//	}
+		//	);
 			
 		
 		PublicDependencyModuleNames.AddRange(

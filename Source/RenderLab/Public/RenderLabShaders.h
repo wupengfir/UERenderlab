@@ -10,6 +10,8 @@ public:
     SHADER_USE_PARAMETER_STRUCT(FRenderLabCS, FGlobalShader);
 
     BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
+        SHADER_PARAMETER(FIntPoint, OutputSize)
+
         SHADER_PARAMETER_RDG_TEXTURE_UAV(
             RWTexture2D<float4>,
             OutputTexture
