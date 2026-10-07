@@ -26,3 +26,35 @@ public:
             ERHIFeatureLevel::SM5);
     }
 };
+
+class FRenderLabPostProcessCS : public FGlobalShader
+{
+public:
+    DECLARE_GLOBAL_SHADER(FRenderLabPostProcessCS);
+
+    SHADER_USE_PARAMETER_STRUCT(
+        FRenderLabPostProcessCS,
+        FGlobalShader);
+
+    BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
+        SHADER_PARAMETER_RDG_TEXTURE(
+            Texture2D,
+            InputTexture)
+
+        SHADER_PARAMETER_RDG_TEXTURE_UAV(
+            RWTexture2D<float4>,
+            OutputTexture)
+
+        SHADER_PARAMETER(FIntPoint, ViewRectMin)
+        SHADER_PARAMETER(FIntPoint, ViewSize)
+        SHADER_PARAMETER(float, Strength)
+    END_SHADER_PARAMETER_STRUCT()
+
+    static bool ShouldCompilePermutation(
+        const FGlobalShaderPermutationParameters& Parameters)
+    {
+        return IsFeatureLevelSupported(
+            Parameters.Platform,
+            ERHIFeatureLevel::SM5);
+    }
+};

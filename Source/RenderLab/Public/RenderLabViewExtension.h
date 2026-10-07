@@ -1,0 +1,42 @@
+#pragma once
+
+#include "SceneViewExtension.h"
+
+class FRenderLabViewExtension final
+    : public FSceneViewExtensionBase
+{
+public:
+    explicit FRenderLabViewExtension(
+        const FAutoRegister& AutoRegister)
+        : FSceneViewExtensionBase(AutoRegister)
+    {
+    }
+
+    virtual void SetupViewFamily(
+        FSceneViewFamily& InViewFamily) override
+    {
+    }
+
+    virtual void SetupView(
+        FSceneViewFamily& InViewFamily,
+        FSceneView& InView) override
+    {
+    }
+
+    virtual void BeginRenderViewFamily(
+        FSceneViewFamily& InViewFamily) override
+    {
+    }
+
+    virtual void SubscribeToPostProcessingPass(
+        EPostProcessingPass Pass,
+        const FSceneView& InView,
+        FAfterPassCallbackDelegateArray& InOutPassCallbacks,
+        bool bIsPassEnabled) override;
+
+private:
+    FScreenPassTexture PostProcessAfterTonemap_RenderThread(
+        FRDGBuilder& GraphBuilder,
+        const FSceneView& View,
+        const FPostProcessMaterialInputs& Inputs);
+};

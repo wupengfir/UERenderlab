@@ -6,3 +6,10 @@ IMPLEMENT_GLOBAL_SHADER(
     "MainCS",
     SF_Compute
 );
+
+IMPLEMENT_GLOBAL_SHADER(
+    FRenderLabPostProcessCS,
+    "/Plugin/RenderLab/Private/RenderLabPostProcess.usf",
+    "MainCS",
+    SF_Compute
+);

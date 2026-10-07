@@ -44,7 +44,8 @@ public class RenderLab : ModuleRules
 				"SlateCore",
 				"RenderCore",
 				"RHI",
-				"Projects"
+				"Projects",
+				"Renderer",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

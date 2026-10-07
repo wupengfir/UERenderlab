@@ -4,6 +4,10 @@
 #include "Interfaces/IPluginManager.h"
 #include "Misc/Paths.h"
 #include "ShaderCore.h"
+
+#include "RenderLabViewExtension.h"
+#include "RenderingThread.h"
+#include "SceneViewExtension.h"
 #define LOCTEXT_NAMESPACE "FRenderLabModule"
 
 void FRenderLabModule::StartupModule()
@@ -38,12 +42,52 @@ void FRenderLabModule::StartupModule()
         *ShaderDirectory
     );
 	UE_LOG(LogTemp, Log, TEXT("RenderLab module started."));
+
+    if (GEngine)
+    {
+        ViewExtension =
+            FSceneViewExtensions::NewExtension<
+            FRenderLabViewExtension>();
+    }
+    else
+    {
+        PostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddLambda(
+            [this]()
+            {
+                ViewExtension =
+                    FSceneViewExtensions::NewExtension<
+                    FRenderLabViewExtension>();
+                UE_LOG(
+                    LogTemp,
+                    Log,
+                    TEXT("RenderLab view extension registered after engine init."));
+			});
+    }
+
+
+    UE_LOG(
+        LogTemp,
+        Log,
+        TEXT("RenderLab view extension registered."));
+
 }
+
+
 
 void FRenderLabModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+    if (PostEngineInitHandle.IsValid())
+    {
+        FCoreDelegates::OnPostEngineInit.Remove(
+            PostEngineInitHandle);
+
+        PostEngineInitHandle.Reset();
+    }
+    if (ViewExtension.IsValid())
+    {
+        FlushRenderingCommands();
+        ViewExtension.Reset();
+    }
 }
 
 #undef LOCTEXT_NAMESPACE
