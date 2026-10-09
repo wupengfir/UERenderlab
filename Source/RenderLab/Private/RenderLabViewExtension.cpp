@@ -44,6 +44,50 @@ void FRenderLabViewExtension::SubscribeToPostProcessingPass(
             PostProcessAfterTonemap_RenderThread));
 }
 
+void FRenderLabViewExtension::PostRenderBasePassDeferred_RenderThread(FRDGBuilder& GraphBuilder, FSceneView& InView, const FRenderTargetBindingSlots& RenderTargets, TRDGUniformBufferRef<FSceneTextureUniformParameters> SceneTextures)
+{
+    FRDGTextureRef SceneDepth = RenderTargets.DepthStencil.GetTexture();
+    const FRDGTextureDesc OutputDesc =
+        FRDGTextureDesc::Create2D(
+            SceneDepth->Desc.Extent,
+            PF_R32_FLOAT,
+            FClearValueBinding::None,
+            TexCreate_ShaderResource |
+            TexCreate_UAV);
+
+    CustomDepth =
+        GraphBuilder.CreateTexture(
+            OutputDesc,
+            TEXT("RenderLab.SceneDepthOutput"));
+
+    FRenderLabDepthCS::FParameters* PassParameters =
+        GraphBuilder.AllocParameters<
+        FRenderLabDepthCS::FParameters>();
+
+    PassParameters->InputTexture = SceneDepth;
+
+    PassParameters->OutputTexture =
+        GraphBuilder.CreateUAV(CustomDepth);
+
+    PassParameters->ViewRectMin = {0,0};
+    PassParameters->ViewSize = SceneDepth->Desc.Extent;
+    
+    TShaderMapRef<FRenderLabDepthCS> ComputeShader(
+        GetGlobalShaderMap(InView.GetFeatureLevel()));
+
+    const FIntVector GroupCount(
+        FMath::DivideAndRoundUp(PassParameters->ViewSize.X, 8),
+        FMath::DivideAndRoundUp(PassParameters->ViewSize.Y, 8),
+        1);
+
+    FComputeShaderUtils::AddPass(
+        GraphBuilder,
+        RDG_EVENT_NAME("RenderLab.PostProcess"),
+        ComputeShader,
+        PassParameters,
+        GroupCount);
+}
+
 FScreenPassTexture
 FRenderLabViewExtension::PostProcessAfterTonemap_RenderThread(
     FRDGBuilder& GraphBuilder,
@@ -77,8 +121,8 @@ FRenderLabViewExtension::PostProcessAfterTonemap_RenderThread(
         GraphBuilder.AllocParameters<
         FRenderLabPostProcessCS::FParameters>();
 
-    PassParameters->InputTexture = SceneColor.Texture;
-
+    PassParameters->InputTexture = CustomDepth;// SceneColor.Texture;
+	PassParameters->InputTextureSampler_clamp_linear = TStaticSamplerState<SF_Bilinear, AM_Clamp, AM_Clamp, AM_Clamp>::GetRHI();
     PassParameters->OutputTexture =
         GraphBuilder.CreateUAV(ComputeOutput);
 

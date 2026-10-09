@@ -1,0 +1,27 @@
+#include "/Engine/Public/Platform.ush"
+
+Texture2D<float> InputTexture;
+RWTexture2D<float> OutputTexture;
+
+int2 ViewRectMin;
+int2 ViewSize;
+
+
+[numthreads(8, 8, 1)]
+void MainCS(uint3 DispatchThreadId : SV_DispatchThreadID)
+{
+    int2 LocalPixel = int2(DispatchThreadId.xy);
+
+    if (any(LocalPixel >= ViewSize))
+    {
+        return;
+    }
+    float2 uv =
+        (float2(DispatchThreadId.xy) + 0.5) /
+        float2(ViewSize);
+    int2 PixelPosition = ViewRectMin + LocalPixel;
+    float depth = InputTexture.Load(int3(PixelPosition, 0));
+
+
+    OutputTexture[PixelPosition] = saturate((depth) * 1);
+}

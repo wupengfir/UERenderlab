@@ -13,3 +13,10 @@ IMPLEMENT_GLOBAL_SHADER(
     "MainCS",
     SF_Compute
 );
+
+IMPLEMENT_GLOBAL_SHADER(
+    FRenderLabDepthCS,
+    "/Plugin/RenderLab/Private/RenderLabDepth.usf",
+    "MainCS",
+    SF_Compute
+);

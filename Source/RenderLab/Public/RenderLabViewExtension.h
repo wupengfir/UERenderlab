@@ -1,11 +1,14 @@
 #pragma once
 
 #include "SceneViewExtension.h"
-
+class FRDGTexture;
 class FRenderLabViewExtension final
     : public FSceneViewExtensionBase
 {
 public:
+
+    FRDGTexture* CustomDepth;
+
     explicit FRenderLabViewExtension(
         const FAutoRegister& AutoRegister)
         : FSceneViewExtensionBase(AutoRegister)
@@ -34,6 +37,12 @@ public:
         FAfterPassCallbackDelegateArray& InOutPassCallbacks,
         bool bIsPassEnabled) override;
 
+
+    void PostRenderBasePassDeferred_RenderThread(
+        FRDGBuilder& GraphBuilder, 
+        FSceneView& InView, 
+        const FRenderTargetBindingSlots& RenderTargets, 
+        TRDGUniformBufferRef<FSceneTextureUniformParameters> SceneTextures) override;
 private:
     FScreenPassTexture PostProcessAfterTonemap_RenderThread(
         FRDGBuilder& GraphBuilder,

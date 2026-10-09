@@ -1,6 +1,7 @@
 #include "/Engine/Public/Platform.ush"
 
 Texture2D<float4> InputTexture;
+SamplerState InputTextureSampler_clamp_linear;
 RWTexture2D<float4> OutputTexture;
 
 int2 ViewRectMin;
@@ -18,13 +19,14 @@ void MainCS(uint3 DispatchThreadId : SV_DispatchThreadID)
     }
 
     int2 PixelPosition = ViewRectMin + LocalPixel;
-
-    float4 SceneColor = InputTexture.Load(
-        int3(PixelPosition, 0));
+    float2 uv =
+        (float2(DispatchThreadId.xy) + 0.5) /
+        float2(ViewSize);
+    float4 SceneColor = InputTexture.SampleLevel(InputTextureSampler_clamp_linear,uv, 0); //InputTexture.Load(int3(PixelPosition, 0));
 
     float3 InvertedColor = 1.0 - SceneColor.rgb;
 
     OutputTexture[PixelPosition] = float4(
         lerp(SceneColor.rgb, InvertedColor, Strength),
-        SceneColor.a);
+        1);
 }
